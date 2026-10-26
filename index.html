@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Plano Media Planner</title>
+<meta name="description" content="Plano: a paid media planner for the Portuguese and Spanish markets. Forecast reach, clicks and conversions across Meta, Google, TikTok, LinkedIn and Pinterest, and check ad copy against platform limits.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a working media plan sheet. Inputs left, forecast right; copy check below. Cobalt ink on cool paper, like a planner's printout. */
+:root{
+  --paper:#f3f5f8; --sheet:#ffffff; --ink:#141b2b; --muted:#5b6478; --rule:#d9dee8;
+  --cobalt:#1f47c7; --cobalt-soft:#e4eafb; --ok:#16794a; --warn:#a15c00; --bad:#b4232c;
+  --c-meta:#1f47c7; --c-google:#16794a; --c-tiktok:#b4232c; --c-linkedin:#0b6b8f; --c-pinterest:#a15c00;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0e1220; --sheet:#161b2c; --ink:#e7ebf5; --muted:#99a2b8; --rule:#2a3149;
+  --cobalt:#8aa4ff; --cobalt-soft:#1f2848; --ok:#5fd09a; --warn:#f0b35a; --bad:#ff8a8f;
+  --c-meta:#8aa4ff; --c-google:#5fd09a; --c-tiktok:#ff8a8f; --c-linkedin:#6cc6e8; --c-pinterest:#f0b35a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0e1220; --sheet:#161b2c; --ink:#e7ebf5; --muted:#99a2b8; --rule:#2a3149;
+  --cobalt:#8aa4ff; --cobalt-soft:#1f2848; --ok:#5fd09a; --warn:#f0b35a; --bad:#ff8a8f;
+  --c-meta:#8aa4ff; --c-google:#5fd09a; --c-tiktok:#ff8a8f; --c-linkedin:#6cc6e8; --c-pinterest:#f0b35a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 48px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;border-bottom:2px solid var(--ink);padding-bottom:16px}
+.brand h1{font-family:var(--f-display);font-weight:700;font-size:clamp(2.2rem,6vw,3.4rem);line-height:1;margin:0;letter-spacing:-.02em}
+.brand h1 span{color:var(--cobalt)}
+.brand p{margin:8px 0 0;color:var(--muted);max-width:58ch;text-wrap:pretty}
+.meta-tag{font-family:var(--f-mono);font-size:12px;color:var(--muted);text-align:right;line-height:1.7}
+.meta-tag b{color:var(--ink);font-weight:500}
+nav.tabs{display:flex;gap:4px;flex-wrap:wrap}
+nav.tabs button{font:500 14px var(--f-body);background:transparent;color:var(--muted);border:1px solid var(--rule);border-radius:999px;padding:7px 16px;cursor:pointer}
+nav.tabs button[aria-selected="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+nav.tabs button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--cobalt);outline-offset:2px}
+.grid{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:6px;padding:20px;display:flex;flex-direction:column;gap:18px;min-width:0}
+.eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0}
+h2{font-family:var(--f-display);font-weight:700;font-size:1.35rem;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label,.lbl{font-size:13px;font-weight:600}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+input[type=number],select,textarea,input[type=text]{font:inherit;color:var(--ink);background:var(--paper);border:1px solid var(--rule);border-radius:4px;padding:8px 10px;width:100%;min-width:0}
+input[type=number]{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.seg{display:flex;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.seg button{flex:1;font:500 13px var(--f-body);padding:8px 6px;border:0;background:transparent;color:var(--muted);cursor:pointer}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--cobalt-soft);color:var(--cobalt)}
+.mix{display:flex;flex-direction:column;gap:12px}
+.mixrow{display:grid;grid-template-columns:92px 1fr 52px;align-items:center;gap:10px}
+.mixrow .name{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500}
+.dot{width:9px;height:9px;border-radius:2px;flex:none}
+.mixrow output{font-family:var(--f-mono);font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--cobalt)}
+.mixbar{display:flex;height:10px;border-radius:2px;overflow:hidden;background:var(--rule)}
+.mixbar i{display:block;height:100%}
+.hint{font-size:12.5px;color:var(--muted);margin:0}
+.btn{font:600 13px var(--f-body);border-radius:4px;padding:9px 14px;cursor:pointer;border:1px solid var(--ink);background:var(--ink);color:var(--paper)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+@media (max-width:560px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{background:var(--sheet);padding:14px}
+.kpi .v{font-family:var(--f-display);font-weight:700;font-size:1.6rem;line-height:1.1;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.kpi .k{font-size:12px;color:var(--muted)}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:13.5px}
+th,td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--rule);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+thead th{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--paper)}
+td{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+td:first-child{font-family:var(--f-body);font-weight:500}
+tfoot td{font-weight:600;border-bottom:0;background:var(--paper)}
+.cmp{display:flex;flex-direction:column;gap:10px}
+.cmprow{display:grid;grid-template-columns:92px 1fr;gap:10px;align-items:center;font-size:12.5px}
+.cmprow .bars{display:flex;flex-direction:column;gap:3px}
+.cmprow .b{height:8px;border-radius:2px;min-width:2px}
+.cmprow .b.spend{opacity:.35}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:16px;height:8px;border-radius:2px;background:var(--ink)}
+.legend i.s{opacity:.35}
+.insights{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.insights li{text-wrap:pretty}
+details.assume summary{cursor:pointer;font-weight:600;font-size:14px}
+details.assume .tablewrap{margin-top:12px}
+details.assume input{width:84px;padding:5px 7px;font-size:13px;text-align:right}
+.copygrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:860px){.copygrid{grid-template-columns:minmax(0,1fr)}}
+.cfield{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--rule);padding-top:14px}
+.cfield .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.count{font-family:var(--f-mono);font-size:12px;font-variant-numeric:tabular-nums}
+.meter{height:4px;background:var(--rule);border-radius:2px;overflow:hidden}
+.meter i{display:block;height:100%}
+.pill{font:600 11px var(--f-mono);letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid currentColor}
+.ok{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+.preview{border:1px solid var(--rule);border-radius:8px;background:var(--paper);padding:14px;display:flex;flex-direction:column;gap:8px;font-size:14px}
+.preview .pv-h{font-weight:600}
+.preview .pv-trunc{color:var(--muted)}
+.checks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.checks li{display:grid;grid-template-columns:22px 1fr;gap:6px;font-size:13.5px}
+.checks .mk{font-family:var(--f-mono);font-weight:600}
+footer{border-top:1px solid var(--rule);padding-top:16px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--muted)}
+footer a{color:var(--cobalt)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:4px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <h1>Plano<span>.</span></h1>
+      <p>A paid media planner for Portugal and Spain. Split a budget across five ad platforms, see what it can realistically buy, and check your ad copy before it goes live.</p>
+    </div>
+    <div class="meta-tag">Concept project · v1.0<br>by <b>Alberto Machado Domínguez</b></div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button role="tab" id="tab-plan" aria-selected="true" aria-controls="view-plan">Budget forecast</button>
+    <button role="tab" id="tab-copy" aria-selected="false" aria-controls="view-copy">Ad copy check</button>
+    <button role="tab" id="tab-method" aria-selected="false" aria-controls="view-method">Method</button>
+  </nav>
+
+  <!-- PLAN -->
+  <section id="view-plan" role="tabpanel" aria-labelledby="tab-plan">
+    <div class="grid">
+      <div class="panel">
+        <div><p class="eyebrow">Inputs</p><h2>Campaign brief</h2></div>
+        <div class="row2">
+          <div class="field"><label for="budget">Total budget (€)</label><input type="number" id="budget" min="100" step="100" value="6000"></div>
+          <div class="field"><label for="days">Flight (days)</label><input type="number" id="days" min="1" max="365" value="30"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="market">Market</label>
+            <select id="market"><option value="PT">Portugal</option><option value="ES">Spain</option><option value="IB">Iberia (PT + ES)</option></select></div>
+          <div class="field"><label for="aov">Value per conversion (€)</label><input type="number" id="aov" min="0" step="1" value="45"></div>
+        </div>
+        <div class="field"><span class="lbl" id="objlbl">Objective</span>
+          <div class="seg" role="group" aria-labelledby="objlbl" id="objective">
+            <button type="button" data-v="awareness" aria-pressed="false">Awareness</button>
+            <button type="button" data-v="traffic" aria-pressed="false">Traffic</button>
+            <button type="button" data-v="conversions" aria-pressed="true">Conversions</button>
+          </div>
+        </div>
+        <div class="field">
+          <span class="lbl">Channel mix</span>
+          <div class="mixbar" id="mixbar" aria-hidden="true"></div>
+          <div class="mix" id="mix"></div>
+          <p class="hint" id="mixnote">Shares are normalised to 100%.</p>
+        </div>
+        <div class="btns">
+          <button type="button" class="btn" id="suggest">Suggest a mix for this objective</button>
+          <button type="button" class="btn ghost" id="reset">Reset</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div><p class="eyebrow">Forecast · <span id="fc-sub">Portugal, 30 days</span></p><h2 id="headline">What €6,000 buys</h2></div>
+        <div class="kpis" id="kpis"></div>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Channel</th><th>Budget</th><th>€/day</th><th>Impressions</th><th>Clicks</th><th>CPC</th><th>Conv.</th><th>CPA</th><th>ROAS</th></tr></thead>
+            <tbody id="tbody"></tbody>
+            <tfoot id="tfoot"></tfoot>
+          </table>
+        </div>
+        <div class="cmp">
+          <div class="legend"><span><i class="s"></i>Share of budget</span><span><i></i>Share of conversions</span></div>
+          <div id="cmp"></div>
+        </div>
+        <div>
+          <p class="eyebrow" style="margin-bottom:8px">Reading the plan</p>
+          <ul class="insights" id="insights"></ul>
+        </div>
+        <div class="btns">
+          <button type="button" class="btn" id="copyplan">Copy plan for Google Sheets</button>
+        </div>
+        <details class="assume" id="assume">
+          <summary>Edit benchmark assumptions</summary>
+          <p class="hint" style="margin-top:8px">Starting points for the selected market, not guarantees. Replace them with numbers from your own ad accounts as soon as you have them.</p>
+          <div class="tablewrap">
+            <table><thead><tr><th>Channel</th><th>CPM (€)</th><th>CTR (%)</th><th>Conv. rate (%)</th></tr></thead><tbody id="atbody"></tbody></table>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- COPY -->
+  <section id="view-copy" role="tabpanel" aria-labelledby="tab-copy" hidden>
+    <div class="copygrid">
+      <div class="panel">
+        <div><p class="eyebrow">Write</p><h2>Ad copy</h2></div>
+        <div class="field"><label for="platform">Platform and format</label>
+          <select id="platform"></select></div>
+        <div id="cfields" style="display:flex;flex-direction:column;gap:14px"></div>
+      </div>
+      <div class="panel">
+        <div><p class="eyebrow">Check</p><h2>Before it goes live</h2></div>
+        <div class="preview" id="preview" aria-label="Rough feed preview"></div>
+        <ul class="checks" id="checks"></ul>
+        <p class="hint" id="specnote"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- METHOD -->
+  <section id="view-method" role="tabpanel" aria-labelledby="tab-method" hidden>
+    <div class="panel" style="max-width:760px">
+      <div><p class="eyebrow">How the numbers work</p><h2>Method and assumptions</h2></div>
+      <p>Each channel's budget is turned into a forecast with three numbers a media buyer works with every day: what 1,000 impressions cost (CPM), how many people click (CTR) and how many clickers convert (conversion rate).</p>
+      <p style="font-family:var(--f-mono);font-size:13px;background:var(--paper);padding:12px;border-radius:4px;overflow-x:auto">impressions = budget ÷ CPM × 1,000<br>clicks = impressions × CTR<br>conversions = clicks × conversion rate<br>CPA = budget ÷ conversions · ROAS = conversions × value ÷ budget</p>
+      <p>Spain is modelled with CPMs about 15% higher than Portugal, reflecting a larger, more competitive auction. The objective nudges the assumptions the way bidding strategy does in practice: awareness campaigns buy cheaper reach with lower intent, conversion campaigns pay more per impression for people more likely to act.</p>
+      <p>The forecast is linear, so it does not model frequency caps, audience saturation or learning phases. Treat it as a planning tool for a first conversation with a client, then replace the benchmarks with real account data after the first week.</p>
+      <p>The copy checker uses each platform's commonly cited character limits and truncation points. Platforms change these often, so confirm against the official ad specs before launch.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Plano is a concept project for my portfolio. Benchmarks are illustrative.</span>
+    <span>Alberto Machado Domínguez · Lisbon · <a href="https://github.com/Hamsterfurioso/plano" id="ghlink" target="_blank" rel="noopener">Source on GitHub</a></span>
+  </footer>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+const CH=[
+ {id:"meta",name:"Meta",color:"--c-meta"},
+ {id:"google",name:"Google Search",color:"--c-google"},
+ {id:"tiktok",name:"TikTok",color:"--c-tiktok"},
+ {id:"linkedin",name:"LinkedIn",color:"--c-linkedin"},
+ {id:"pinterest",name:"Pinterest",color:"--c-pinterest"}
+];
+// Base benchmarks for Portugal (illustrative): CPM €, CTR %, CVR %
+const BASE={meta:{cpm:4.2,ctr:1.1,cvr:2.4},google:{cpm:38,ctr:5.5,cvr:4.2},tiktok:{cpm:3.4,ctr:0.8,cvr:1.1},linkedin:{cpm:24,ctr:0.55,cvr:3.0},pinterest:{cpm:3.8,ctr:0.5,cvr:1.4}};
+const MKT={PT:{cpm:1,label:"Portugal"},ES:{cpm:1.15,label:"Spain"},IB:{cpm:1.1,label:"Portugal + Spain"}};
+const OBJ={awareness:{cpm:.8,ctr:.85,cvr:.7},traffic:{cpm:.95,ctr:1.15,cvr:.85},conversions:{cpm:1.1,ctr:1,cvr:1.15}};
+const SUGGEST={awareness:{meta:40,google:5,tiktok:35,linkedin:5,pinterest:15},traffic:{meta:40,google:25,tiktok:20,linkedin:5,pinterest:10},conversions:{meta:40,google:40,tiktok:10,linkedin:5,pinterest:5}};
+const DEF={budget:6000,days:30,market:"PT",aov:45,objective:"conversions",mix:{...SUGGEST.conversions},over:{}};
+let S=load()||JSON.parse(JSON.stringify(DEF));
+const $=id=>document.getElementById(id);
+const fmt=(n,d=0)=>isFinite(n)?n.toLocaleString("en-GB",{minimumFractionDigits:d,maximumFractionDigits:d}):"–";
+const eur=(n,d=0)=>isFinite(n)?"€"+fmt(n,d):"–";
+const big=n=>n>=1e6?fmt(n/1e6,1)+"M":n>=1e4?fmt(n/1e3,0)+"k":fmt(n);
+function load(){try{const r=localStorage.getItem("plano.v1");return r?JSON.parse(r):null}catch(e){return null}}
+function save(){try{localStorage.setItem("plano.v1",JSON.stringify(S))}catch(e){}}
+function toast(t){const el=$("toast");el.textContent=t;el.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove("on"),1800)}
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
+
+function bench(id){
+  const o=S.over[id]||{},b=BASE[id],m=MKT[S.market],ob=OBJ[S.objective];
+  return {cpm:o.cpm??+(b.cpm*m.cpm*ob.cpm).toFixed(2),ctr:o.ctr??+(b.ctr*ob.ctr).toFixed(2),cvr:o.cvr??+(b.cvr*ob.cvr).toFixed(2)};
+}
+
+// --- build inputs ---
+const mixEl=$("mix");
+CH.forEach(c=>{
+  const r=document.createElement("div");r.className="mixrow";
+  r.innerHTML=`<span class="name"><span class="dot" style="background:var(${c.color})"></span>${c.name}</span><input type="range" id="mx-${c.id}" min="0" max="100" step="5" aria-label="${c.name} weight"><output id="mo-${c.id}"></output>`;
+  mixEl.appendChild(r);
+  r.querySelector("input").addEventListener("input",e=>{S.mix[c.id]=+e.target.value;render()});
+});
+const at=$("atbody");
+CH.forEach(c=>{
+  const tr=document.createElement("tr");
+  tr.innerHTML=`<td>${c.name}</td>`+["cpm","ctr","cvr"].map(k=>`<td><input type="number" step="0.05" min="0" id="as-${c.id}-${k}" aria-label="${c.name} ${k}"></td>`).join("");
+  at.appendChild(tr);
+  ["cpm","ctr","cvr"].forEach(k=>$(`as-${c.id}-${k}`).addEventListener("change",e=>{
+    S.over[c.id]=S.over[c.id]||{};const v=parseFloat(e.target.value);
+    if(isFinite(v)&&v>=0)S.over[c.id][k]=v;else delete S.over[c.id][k];render()}));
+});
+$("budget").addEventListener("input",e=>{S.budget=Math.max(0,+e.target.value||0);render()});
+$("days").addEventListener("input",e=>{S.days=Math.max(1,+e.target.value||1);render()});
+$("aov").addEventListener("input",e=>{S.aov=Math.max(0,+e.target.value||0);render()});
+$("market").addEventListener("change",e=>{S.market=e.target.value;render()});
+$("objective").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;S.objective=b.dataset.v;render()});
+$("suggest").addEventListener("click",()=>{S.mix={...SUGGEST[S.objective]};render();toast("Mix updated for "+S.objective)});
+$("reset").addEventListener("click",()=>{S=JSON.parse(JSON.stringify(DEF));render();toast("Reset to example plan")});
+
+function compute(){
+  const tot=CH.reduce((a,c)=>a+(S.mix[c.id]||0),0)||1;
+  const rows=CH.map(c=>{
+    const share=(S.mix[c.id]||0)/tot,b=bench(c.id),spend=S.budget*share;
+    const imp=b.cpm>0?spend/b.cpm*1000:0,clk=imp*b.ctr/100,conv=clk*b.cvr/100;
+    return {...c,share,spend,imp,clk,conv,b,cpc:clk?spend/clk:NaN,cpa:conv?spend/conv:NaN,roas:spend?conv*S.aov/spend:NaN};
+  });
+  const T=rows.reduce((a,r)=>({spend:a.spend+r.spend,imp:a.imp+r.imp,clk:a.clk+r.clk,conv:a.conv+r.conv}),{spend:0,imp:0,clk:0,conv:0});
+  T.cpc=T.clk?T.spend/T.clk:NaN;T.cpa=T.conv?T.spend/T.conv:NaN;T.roas=T.spend?T.conv*S.aov/T.spend:NaN;
+  return {rows,T,tot};
+}
+
+function render(){
+  $("budget").value=S.budget;$("days").value=S.days;$("aov").value=S.aov;$("market").value=S.market;
+  document.querySelectorAll("#objective button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===S.objective));
+  const {rows,T}=compute();
+  rows.forEach(r=>{$("mx-"+r.id).value=S.mix[r.id]||0;$("mo-"+r.id).textContent=Math.round(r.share*100)+"%";
+    ["cpm","ctr","cvr"].forEach(k=>{const el=$(`as-${r.id}-${k}`);if(document.activeElement!==el)el.value=r.b[k]})});
+  $("mixbar").innerHTML=rows.filter(r=>r.share>0).map(r=>`<i style="width:${r.share*100}%;background:var(${r.color})"></i>`).join("");
+  const active=rows.filter(r=>r.share>0).length;
+  $("mixnote").textContent=active?`${active} active channel${active>1?"s":""}. Shares are normalised to 100%.`:"Move a slider to include at least one channel.";
+  $("fc-sub").textContent=`${MKT[S.market].label}, ${S.days} days, ${S.objective}`;
+  $("headline").textContent=`What ${eur(S.budget)} buys`;
+  const reach=T.imp/ Math.max(1.6, Math.min(4, S.days/8)); // rough unique reach from avg frequency
+  $("kpis").innerHTML=[
+    [big(T.imp),"Impressions"],[big(reach),"Est. people reached"],[big(T.clk),"Clicks · "+eur(T.cpc,2)+" CPC"],
+    [fmt(T.conv),"Conversions · "+eur(T.cpa,2)+" CPA"]
+  ].map(([v,k])=>`<div class="kpi"><div class="v">${v}</div><div class="k">${k}</div></div>`).join("");
+  $("tbody").innerHTML=rows.map(r=>r.share>0?`<tr><td><span class="name" style="display:inline-flex;gap:8px;align-items:center"><span class="dot" style="background:var(${r.color})"></span>${r.name}</span></td><td>${eur(r.spend)}</td><td>${eur(r.spend/S.days,0)}</td><td>${fmt(r.imp)}</td><td>${fmt(r.clk)}</td><td>${eur(r.cpc,2)}</td><td>${fmt(r.conv)}</td><td>${eur(r.cpa,2)}</td><td>${fmt(r.roas,2)}×</td></tr>`:"").join("");
+  $("tfoot").innerHTML=`<tr><td>Total</td><td>${eur(T.spend)}</td><td>${eur(T.spend/S.days,0)}</td><td>${fmt(T.imp)}</td><td>${fmt(T.clk)}</td><td>${eur(T.cpc,2)}</td><td>${fmt(T.conv)}</td><td>${eur(T.cpa,2)}</td><td>${fmt(T.roas,2)}×</td></tr>`;
+  const live=rows.filter(r=>r.share>0);
+  $("cmp").innerHTML=live.map(r=>{const cs=T.conv?r.conv/T.conv:0;return `<div class="cmprow"><span>${r.name}</span><div class="bars"><div class="b spend" style="width:${r.share*100}%;background:var(${r.color})" title="${Math.round(r.share*100)}% of budget"></div><div class="b" style="width:${cs*100}%;background:var(${r.color})" title="${Math.round(cs*100)}% of conversions"></div></div></div>`}).join("");
+  // insights
+  const ins=[];
+  if(live.length){
+    const best=[...live].sort((a,b)=>a.cpa-b.cpa)[0],worst=[...live].sort((a,b)=>b.cpa-a.cpa)[0];
+    const reachKing=[...live].sort((a,b)=>b.imp-a.imp)[0];
+    if(S.objective==="awareness")ins.push(`${reachKing.name} delivers the most impressions (${Math.round(reachKing.imp/T.imp*100)}% of the total). For awareness, judge it on cost per 1,000 people reached, not on CPA.`);
+    ins.push(`${best.name} has the lowest cost per conversion at ${eur(best.cpa,2)}${live.length>1?`, against ${eur(worst.cpa,2)} on ${worst.name}`:""}.`);
+    const be=S.aov>0?T.roas>=1:null;
+    if(be!==null)ins.push(T.roas>=1?`At ${eur(S.aov)} per conversion the plan returns ${fmt(T.roas,2)}× its spend before margins. Check that this covers product cost and fees.`:`At ${eur(S.aov)} per conversion the plan returns ${fmt(T.roas,2)}× its spend, so it loses money on direct sales. That can still work for a launch or a high-lifetime-value product, but say so in the brief.`);
+    const daily=T.spend/S.days;
+    const thin=live.filter(r=>r.spend/S.days<10);
+    if(thin.length)ins.push(`${thin.map(r=>r.name).join(" and ")} ${thin.length>1?"get":"gets"} under €10 a day. Small daily budgets keep ad sets in the learning phase for longer, so consider fewer channels.`);
+    else ins.push(`Daily spend is ${eur(daily)}. Expect around a week of learning before the conversion numbers settle.`);
+  } else ins.push("Add a channel to see a forecast.");
+  $("insights").innerHTML=ins.map(t=>`<li>${t}</li>`).join("");
+  save();
+}
+
+$("copyplan").addEventListener("click",()=>{
+  const {rows,T}=compute();
+  const head=["Channel","Budget (€)","€/day","CPM (€)","CTR (%)","CVR (%)","Impressions","Clicks","CPC (€)","Conversions","CPA (€)","ROAS"];
+  const L=[["Plano media plan",MKT[S.market].label,S.objective,S.days+" days"].join("\t"),head.join("\t")];
+  rows.filter(r=>r.share>0).forEach(r=>L.push([r.name,r.spend.toFixed(0),(r.spend/S.days).toFixed(0),r.b.cpm,r.b.ctr,r.b.cvr,r.imp.toFixed(0),r.clk.toFixed(0),r.cpc.toFixed(2),r.conv.toFixed(1),r.cpa.toFixed(2),r.roas.toFixed(2)].join("\t")));
+  L.push(["Total",T.spend.toFixed(0),(T.spend/S.days).toFixed(0),"","","",T.imp.toFixed(0),T.clk.toFixed(0),T.cpc.toFixed(2),T.conv.toFixed(1),T.cpa.toFixed(2),T.roas.toFixed(2)].join("\t"));
+  copyText(L.join("\n"),"Plan copied. Paste it into a sheet.");
+});
+function copyText(t,msg){
+  const fallback=()=>{const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");toast(msg)}catch(e){toast("Copy blocked. Select the table and copy it manually.")}ta.remove()};
+  try{navigator.clipboard.writeText(t).then(()=>toast(msg),fallback)}catch(e){fallback()}
+}
+
+// --- COPY CHECK ---
+const SPECS={
+ "google-rsa":{label:"Google Search · responsive search ad",fields:[{k:"h1",n:"Headline 1",max:30},{k:"h2",n:"Headline 2",max:30},{k:"h3",n:"Headline 3",max:30},{k:"d1",n:"Description 1",max:90},{k:"d2",n:"Description 2",max:90}],hard:true,note:"Google enforces these limits: the ad will not save if a field is over."},
+ "meta-feed":{label:"Meta · Facebook / Instagram feed",fields:[{k:"primary",n:"Primary text",max:125,multi:true},{k:"headline",n:"Headline",max:40},{k:"desc",n:"Description",max:30}],note:"Meta allows longer text but cuts the primary text with “See more” around 125 characters."},
+ "tiktok":{label:"TikTok · in-feed ad",fields:[{k:"text",n:"Ad text",max:100,multi:true},{k:"name",n:"Display name",max:40}],hard:true,note:"TikTok recommends far shorter text than the maximum; the video carries the message."},
+ "linkedin":{label:"LinkedIn · single image ad",fields:[{k:"intro",n:"Introductory text",max:150,multi:true},{k:"headline",n:"Headline",max:70}],note:"LinkedIn truncates introductory text around 150 characters on desktop."},
+ "pinterest":{label:"Pinterest · standard pin",fields:[{k:"title",n:"Title",max:100},{k:"desc",n:"Description",max:500,multi:true,soft:50}],note:"Only the first 50 or so characters of the description show in most feeds."}
+};
+const SAMPLE={
+ "google-rsa":{h1:"Pastéis de Nata Delivered",h2:"Baked Fresh Every Morning",h3:"Order by 10am, Eat by Noon",d1:"Real Lisbon custard tarts from our Alfama bakery. Boxes of 6 or 12, delivered across the city.",d2:"Free delivery over €20. Order now and get a tin of cinnamon on us."},
+ "meta-feed":{primary:"Still warm when they reach your door. Our pastéis de nata are baked in Alfama at 6am and delivered across Lisbon before lunch. Order a box of 6 today 🥐",headline:"Fresh nata, delivered by noon",desc:"Free delivery over €20"},
+ "tiktok":{text:"POV: your office just ordered 24 pastéis de nata at 9am 🥐 Lisbon delivery by noon",name:"Nata Lisboa"},
+ "linkedin":{intro:"Morning meetings go better with pastry. We deliver fresh pastéis de nata to Lisbon offices by 10am, with invoicing for teams. How many is your team?",headline:"Office breakfast boxes for Lisbon teams"},
+ "pinterest":{title:"Lisbon pastéis de nata: the box we deliver every morning",desc:"Custard tarts baked in Alfama at sunrise. Ideas for hosting a Portuguese breakfast at home, plus how we keep the pastry crisp on the way to you."}
+};
+let C={plat:"meta-feed",vals:JSON.parse(JSON.stringify(SAMPLE))};
+try{const r=localStorage.getItem("plano.copy.v1");if(r)C=JSON.parse(r)}catch(e){}
+const ps=$("platform");
+Object.entries(SPECS).forEach(([k,v])=>{const o=document.createElement("option");o.value=k;o.textContent=v.label;ps.appendChild(o)});
+ps.addEventListener("change",()=>{C.plat=ps.value;buildCopy()});
+const CTA=/\b(order|buy|shop|book|get|try|join|sign up|download|discover|learn|start|claim|save|reserve|call|visit|compra|reserva|descubre|encomenda|experimenta)\b/i;
+function graphemes(s){try{return [...new Intl.Segmenter().segment(s)].length}catch(e){return [...s].length}}
+function buildCopy(){
+  ps.value=C.plat;const sp=SPECS[C.plat];C.vals[C.plat]=C.vals[C.plat]||{};
+  $("cfields").innerHTML=sp.fields.map(f=>`<div class="cfield"><div class="top"><label for="cf-${f.k}" class="lbl">${f.n}</label><span class="count" id="cc-${f.k}"></span></div>${f.multi?`<textarea id="cf-${f.k}" rows="3"></textarea>`:`<input type="text" id="cf-${f.k}">`}<div class="meter"><i id="cm-${f.k}"></i></div></div>`).join("");
+  sp.fields.forEach(f=>{const el=$("cf-"+f.k);el.value=C.vals[C.plat][f.k]||"";el.addEventListener("input",()=>{C.vals[C.plat][f.k]=el.value;checkCopy()})});
+  $("specnote").textContent=sp.note+" Limits change: confirm in the platform's ad specs before launch.";
+  checkCopy();
+}
+function checkCopy(){
+  const sp=SPECS[C.plat],v=C.vals[C.plat];let over=0,empty=0;
+  sp.fields.forEach(f=>{
+    const n=graphemes(v[f.k]||""),ratio=n/f.max;
+    const cls=n>f.max?"bad":(f.soft&&n>f.soft)||ratio>.9?"warn":"ok";
+    if(n>f.max)over++;if(!n)empty++;
+    $("cc-"+f.k).innerHTML=`<span class="${cls}">${n}</span> / ${f.max}${f.soft?` · ${f.soft} visible`:""}`;
+    const m=$("cm-"+f.k);m.style.width=Math.min(100,ratio*100)+"%";m.style.background=`var(--${cls})`;
+  });
+  // preview
+  const vals=sp.fields.map(f=>v[f.k]||"");
+  const cut=(s,n)=>{const a=[...s];return a.length>n?{a:a.slice(0,n).join(""),b:true}:{a:s,b:false}};
+  let pv="";
+  if(C.plat==="google-rsa"){pv=`<div class="pv-h" style="color:var(--cobalt)">${esc([v.h1,v.h2,v.h3].filter(Boolean).join(" | "))}</div><div>${esc([v.d1,v.d2].filter(Boolean).join(" "))}</div>`}
+  else{const body=sp.fields.find(f=>f.multi);const lim=body.soft||body.max;const c=cut(v[body.k]||"",lim);
+    pv=`<div>${esc(c.a)}${c.b?`<span class="pv-trunc">… See more</span>`:""}</div>`+sp.fields.filter(f=>!f.multi).map(f=>`<div class="pv-h">${esc(v[f.k]||"")}</div>`).join("")}
+  $("preview").innerHTML=`<span class="eyebrow">Rough feed preview</span>`+pv;
+  const all=vals.join(" ");
+  const ck=[];
+  ck.push(over?[`bad`,`✕`,`${over} field${over>1?"s are":" is"} over the limit${sp.hard?" and will be rejected":" and will be cut off"}.`]:["ok","✓","Every field fits its limit."]);
+  if(empty)ck.push(["warn","!",`${empty} field${empty>1?"s are":" is"} empty.`]);
+  ck.push(CTA.test(all)?["ok","✓","Includes a clear action verb."]:["warn","!","No clear call to action. Tell people what to do next."]);
+  ck.push(/\d/.test(all)?["ok","✓","Uses a number, price or time. Specifics tend to lift CTR."]:["warn","!","No numbers. A price, quantity or deadline makes the offer concrete."]);
+  const caps=(all.match(/\b[A-Z]{4,}\b/g)||[]).length;
+  if(caps)ck.push(["warn","!",`${caps} word${caps>1?"s":""} in full capitals. Most platforms review these as excessive capitalisation.`]);
+  if(/!{2,}/.test(all))ck.push(["warn","!","Repeated exclamation marks. Google rejects them in headlines."]);
+  const firstField=vals[0]||"";
+  if(C.plat!=="google-rsa"){const hook=[...firstField].slice(0,40).join("");ck.push([/[?]|\bpov\b|\byou\b|\byour\b|\d/i.test(hook)?"ok":"warn",/[?]|\bpov\b|\byou\b|\byour\b|\d/i.test(hook)?"✓":"!",`Opening line: “${esc(hook)}${firstField.length>40?"…":""}”. The first few words decide whether people stop scrolling.`])}
+  $("checks").innerHTML=ck.map(([c,m,t])=>`<li><span class="mk ${c}">${m}</span><span>${t}</span></li>`).join("");
+  try{localStorage.setItem("plano.copy.v1",JSON.stringify(C))}catch(e){}
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+// --- tabs ---
+const tabs=[...document.querySelectorAll('[role=tab]')];
+function show(id){tabs.forEach(t=>{const on=t.id==="tab-"+id;t.setAttribute("aria-selected",on);$(t.getAttribute("aria-controls")).hidden=!on})}
+tabs.forEach(t=>t.addEventListener("click",()=>show(t.id.slice(4))));
+const h=(location.hash||"").slice(1);if(["plan","copy","method"].includes(h))show(h);
+
+render();buildCopy();
+})();
+</script>
+
+</body>
+</html>
