@@ -3,7 +3,7 @@
 **A paid media planner for Portugal and Spain.**
 Split a campaign budget across Meta, Google Search, TikTok, LinkedIn and Pinterest, forecast what it can buy, and check ad copy against each platform's limits before launch.
 
-👉 **Live demo:** **[hamsterfurioso.github.io/plano](https://hamsterfurioso.github.io/plano/)**
+👉 **Live demo:** **[amachadod.github.io/plano](https://amachadod.github.io/plano/)**
 
 *Concept project by Alberto Machado Domínguez (Lisbon). Built to show how I approach media planning, budgeting and ad copy for clients.*
 
@@ -53,6 +53,8 @@ A single, dependency-free HTML file (HTML, CSS and vanilla JavaScript). It works
 ## Run it
 
 Open `index.html` in any browser, or publish it with GitHub Pages (Settings → Pages → Deploy from branch → `main` / root).
+
+See also [Minuta](https://github.com/amachadod/minuta), which turns call notes into tasks for the right team.
 
 ## About me
 
