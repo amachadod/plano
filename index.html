@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Plano Media Planner</title>
-<meta name="description" content="Plano: a paid media planner for the Portuguese and Spanish markets. Forecast reach, clicks and conversions across Meta, Google, TikTok, LinkedIn and Pinterest, and check ad copy against platform limits.">
+<meta name="description" content="Plano: a paid media budget forecaster for any market. Split a budget across Meta, Google Search, YouTube, TikTok, LinkedIn and Pinterest and forecast reach, clicks, conversions, CPA and ROAS.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -12,7 +12,7 @@
 :root{
   --paper:#f3f5f8; --sheet:#ffffff; --ink:#141b2b; --muted:#5b6478; --rule:#d9dee8;
   --cobalt:#1f47c7; --cobalt-soft:#e4eafb; --ok:#16794a; --warn:#a15c00; --bad:#b4232c;
-  --c-meta:#1f47c7; --c-google:#16794a; --c-tiktok:#b4232c; --c-linkedin:#0b6b8f; --c-pinterest:#a15c00;
+  --c-meta:#1f47c7; --c-google:#16794a; --c-tiktok:#b4232c; --c-linkedin:#0b6b8f; --c-pinterest:#a15c00; --c-youtube:#7a3fb0;
   --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
   --f-body:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
@@ -20,12 +20,13 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --paper:#0e1220; --sheet:#161b2c; --ink:#e7ebf5; --muted:#99a2b8; --rule:#2a3149;
   --cobalt:#8aa4ff; --cobalt-soft:#1f2848; --ok:#5fd09a; --warn:#f0b35a; --bad:#ff8a8f;
-  --c-meta:#8aa4ff; --c-google:#5fd09a; --c-tiktok:#ff8a8f; --c-linkedin:#6cc6e8; --c-pinterest:#f0b35a; color-scheme:dark}}
+  --c-meta:#8aa4ff; --c-google:#5fd09a; --c-tiktok:#ff8a8f; --c-linkedin:#6cc6e8; --c-pinterest:#f0b35a; --c-youtube:#c49bf0; color-scheme:dark}}
 :root[data-theme="dark"]{
   --paper:#0e1220; --sheet:#161b2c; --ink:#e7ebf5; --muted:#99a2b8; --rule:#2a3149;
   --cobalt:#8aa4ff; --cobalt-soft:#1f2848; --ok:#5fd09a; --warn:#f0b35a; --bad:#ff8a8f;
-  --c-meta:#8aa4ff; --c-google:#5fd09a; --c-tiktok:#ff8a8f; --c-linkedin:#6cc6e8; --c-pinterest:#f0b35a; color-scheme:dark}
+  --c-meta:#8aa4ff; --c-google:#5fd09a; --c-tiktok:#ff8a8f; --c-linkedin:#6cc6e8; --c-pinterest:#f0b35a; --c-youtube:#c49bf0; color-scheme:dark}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 48px}
 .wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
@@ -111,6 +112,10 @@ footer{border-top:1px solid var(--rule);padding-top:16px;display:flex;justify-co
 footer a{color:var(--cobalt)}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:4px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.on{opacity:1}
+.idx{font-family:var(--f-mono);font-size:15px;padding:8px 0;font-variant-numeric:tabular-nums}
+table.mkt{min-width:520px}
+table.mkt tr.cur td{background:var(--cobalt-soft);color:var(--cobalt)}
+table.mkt td.best{color:var(--ok);font-weight:600}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -121,9 +126,9 @@ footer a{color:var(--cobalt)}
   <header>
     <div class="brand">
       <h1>Plano<span>.</span></h1>
-      <p>A paid media planner for Portugal and Spain. Split a budget across five ad platforms, see what it can realistically buy, and check your ad copy before it goes live.</p>
+      <p>A paid media budget forecaster for any market. Split a budget across six ad platforms, see what it can realistically buy in that country, and compare the same plan across markets.</p>
     </div>
-    <div class="meta-tag">Concept project · v1.0<br>by <b>Alberto Machado Domínguez</b></div>
+    <div class="meta-tag">Concept project · v2.0<br>by <b>Alberto Machado Domínguez</b></div>
   </header>
 
   <nav class="tabs" role="tablist" aria-label="Sections">
@@ -138,13 +143,17 @@ footer a{color:var(--cobalt)}
       <div class="panel">
         <div><p class="eyebrow">Inputs</p><h2>Campaign brief</h2></div>
         <div class="row2">
-          <div class="field"><label for="budget">Total budget (€)</label><input type="number" id="budget" min="100" step="100" value="6000"></div>
+          <div class="field"><label for="market">Market</label><select id="market"></select></div>
+          <div class="field"><label for="currency">Currency</label><select id="currency"></select></div>
+        </div>
+        <div class="field" id="customwrap" hidden><label for="customidx">Custom cost index (1.00 = Western Europe)</label><input type="number" id="customidx" min="0.05" max="5" step="0.05" value="1"></div>
+        <div class="row2">
+          <div class="field"><label for="budget" id="budgetlbl">Total budget</label><input type="number" id="budget" min="100" step="100" value="10000"></div>
           <div class="field"><label for="days">Flight (days)</label><input type="number" id="days" min="1" max="365" value="30"></div>
         </div>
         <div class="row2">
-          <div class="field"><label for="market">Market</label>
-            <select id="market"><option value="PT">Portugal</option><option value="ES">Spain</option><option value="IB">Iberia (PT + ES)</option></select></div>
-          <div class="field"><label for="aov">Value per conversion (€)</label><input type="number" id="aov" min="0" step="1" value="45"></div>
+          <div class="field"><label for="aov" id="aovlbl">Value per conversion</label><input type="number" id="aov" min="0" step="1" value="60"></div>
+          <div class="field"><span class="lbl">Market cost index</span><output id="idxout" class="idx">1.00×</output></div>
         </div>
         <div class="field"><span class="lbl" id="objlbl">Objective</span>
           <div class="seg" role="group" aria-labelledby="objlbl" id="objective">
@@ -166,11 +175,11 @@ footer a{color:var(--cobalt)}
       </div>
 
       <div class="panel">
-        <div><p class="eyebrow">Forecast · <span id="fc-sub">Portugal, 30 days</span></p><h2 id="headline">What €6,000 buys</h2></div>
+        <div><p class="eyebrow">Forecast · <span id="fc-sub">United States, 30 days</span></p><h2 id="headline">What $10,000 buys</h2></div>
         <div class="kpis" id="kpis"></div>
         <div class="tablewrap">
           <table>
-            <thead><tr><th>Channel</th><th>Budget</th><th>€/day</th><th>Impressions</th><th>Clicks</th><th>CPC</th><th>Conv.</th><th>CPA</th><th>ROAS</th></tr></thead>
+            <thead><tr><th>Channel</th><th>Budget</th><th>Per day</th><th>Impressions</th><th>Clicks</th><th>CPC</th><th>Conv.</th><th>CPA</th><th>ROAS</th></tr></thead>
             <tbody id="tbody"></tbody>
             <tfoot id="tfoot"></tfoot>
           </table>
@@ -183,14 +192,21 @@ footer a{color:var(--cobalt)}
           <p class="eyebrow" style="margin-bottom:8px">Reading the plan</p>
           <ul class="insights" id="insights"></ul>
         </div>
+        <div>
+          <p class="eyebrow" style="margin-bottom:8px">Same plan in other markets</p>
+          <div class="tablewrap">
+            <table class="mkt"><thead><tr><th>Market</th><th>Cost index</th><th>Clicks</th><th>Conv.</th><th>CPA</th><th>ROAS</th></tr></thead><tbody id="mktbody"></tbody></table>
+          </div>
+          <p class="hint" style="margin-top:8px">Same budget, mix and currency, priced at each market's cost index. Useful for deciding where a fixed budget goes furthest.</p>
+        </div>
         <div class="btns">
           <button type="button" class="btn" id="copyplan">Copy plan for Google Sheets</button>
         </div>
         <details class="assume" id="assume">
           <summary>Edit benchmark assumptions</summary>
-          <p class="hint" style="margin-top:8px">Starting points for the selected market, not guarantees. Replace them with numbers from your own ad accounts as soon as you have them.</p>
+          <p class="hint" style="margin-top:8px">Starting points for the selected market and objective, not guarantees. Replace them with numbers from your own ad accounts as soon as you have them.</p>
           <div class="tablewrap">
-            <table><thead><tr><th>Channel</th><th>CPM (€)</th><th>CTR (%)</th><th>Conv. rate (%)</th></tr></thead><tbody id="atbody"></tbody></table>
+            <table><thead><tr><th>Channel</th><th>CPM</th><th>CTR (%)</th><th>Conv. rate (%)</th></tr></thead><tbody id="atbody"></tbody></table>
           </div>
         </details>
       </div>
@@ -221,14 +237,14 @@ footer a{color:var(--cobalt)}
       <div><p class="eyebrow">How the numbers work</p><h2>Method and assumptions</h2></div>
       <p>Each channel's budget is turned into a forecast with three numbers a media buyer works with every day: what 1,000 impressions cost (CPM), how many people click (CTR) and how many clickers convert (conversion rate).</p>
       <p style="font-family:var(--f-mono);font-size:13px;background:var(--paper);padding:12px;border-radius:4px;overflow-x:auto">impressions = budget ÷ CPM × 1,000<br>clicks = impressions × CTR<br>conversions = clicks × conversion rate<br>CPA = budget ÷ conversions · ROAS = conversions × value ÷ budget</p>
-      <p>Spain is modelled with CPMs about 15% higher than Portugal, reflecting a larger, more competitive auction. The objective nudges the assumptions the way bidding strategy does in practice: awareness campaigns buy cheaper reach with lower intent, conversion campaigns pay more per impression for people more likely to act.</p>
+      <p>Each market has a cost index that scales CPMs against a Western Europe baseline of 1.00. Large, competitive auctions such as the United States sit well above it; markets such as India, Brazil or Southeast Asia sit well below. Choose Custom to set your own index. Click and conversion rates are kept the same across markets, because they depend more on the offer and the creative than on the country. The objective nudges the assumptions the way bidding strategy does in practice: awareness campaigns buy cheaper reach with lower intent, conversion campaigns pay more per impression for people more likely to act.</p>
       <p>The forecast is linear, so it does not model frequency caps, audience saturation or learning phases. Treat it as a planning tool for a first conversation with a client, then replace the benchmarks with real account data after the first week.</p>
       <p>The copy checker uses each platform's commonly cited character limits and truncation points. Platforms change these often, so confirm against the official ad specs before launch.</p>
     </div>
   </section>
 
   <footer>
-    <span>Plano is a concept project for my portfolio. Benchmarks are illustrative.</span>
+    <span>Plano is a concept project for my portfolio. Benchmarks and market cost indices are illustrative.</span>
     <span>Alberto Machado Domínguez · Lisbon · <a href="https://github.com/amachadod/plano" id="ghlink" target="_blank" rel="noopener">Source on GitHub</a></span>
   </footer>
 </div>
@@ -241,28 +257,48 @@ const CH=[
  {id:"google",name:"Google Search",color:"--c-google"},
  {id:"tiktok",name:"TikTok",color:"--c-tiktok"},
  {id:"linkedin",name:"LinkedIn",color:"--c-linkedin"},
- {id:"pinterest",name:"Pinterest",color:"--c-pinterest"}
+ {id:"pinterest",name:"Pinterest",color:"--c-pinterest"},
+ {id:"youtube",name:"YouTube",color:"--c-youtube"}
 ];
-// Base benchmarks for Portugal (illustrative): CPM €, CTR %, CVR %
-const BASE={meta:{cpm:4.2,ctr:1.1,cvr:2.4},google:{cpm:38,ctr:5.5,cvr:4.2},tiktok:{cpm:3.4,ctr:0.8,cvr:1.1},linkedin:{cpm:24,ctr:0.55,cvr:3.0},pinterest:{cpm:3.8,ctr:0.5,cvr:1.4}};
-const MKT={PT:{cpm:1,label:"Portugal"},ES:{cpm:1.15,label:"Spain"},IB:{cpm:1.1,label:"Portugal + Spain"}};
+// Baseline benchmarks for a Western European market (illustrative): CPM, CTR %, CVR %
+const BASE={meta:{cpm:5.5,ctr:1.1,cvr:2.4},google:{cpm:45,ctr:5.5,cvr:4.2},tiktok:{cpm:4.5,ctr:0.8,cvr:1.1},linkedin:{cpm:30,ctr:0.55,cvr:3.0},pinterest:{cpm:4.8,ctr:0.5,cvr:1.4},youtube:{cpm:7,ctr:0.45,cvr:1.0}};
+// Market cost index: multiplies CPMs. 1.00 = Western Europe baseline. Illustrative, edit to match your accounts.
+const MKT={
+ US:{label:"United States",idx:1.6,cur:"USD"},CA:{label:"Canada",idx:1.3,cur:"CAD"},
+ GB:{label:"United Kingdom",idx:1.35,cur:"GBP"},DE:{label:"Germany",idx:1.25,cur:"EUR"},FR:{label:"France",idx:1.1,cur:"EUR"},
+ NL:{label:"Netherlands",idx:1.2,cur:"EUR"},NORDICS:{label:"Nordics",idx:1.35,cur:"EUR"},CH:{label:"Switzerland",idx:1.5,cur:"CHF"},
+ ES:{label:"Spain",idx:0.9,cur:"EUR"},IT:{label:"Italy",idx:0.9,cur:"EUR"},PT:{label:"Portugal",idx:0.75,cur:"EUR"},PL:{label:"Poland",idx:0.6,cur:"EUR"},
+ AU:{label:"Australia",idx:1.4,cur:"AUD"},JP:{label:"Japan",idx:1.2,cur:"USD"},AE:{label:"United Arab Emirates",idx:1.1,cur:"USD"},
+ MX:{label:"Mexico",idx:0.45,cur:"USD"},BR:{label:"Brazil",idx:0.45,cur:"USD"},AR:{label:"Argentina",idx:0.35,cur:"USD"},
+ IN:{label:"India",idx:0.25,cur:"USD"},SEA:{label:"Southeast Asia",idx:0.35,cur:"USD"},ZA:{label:"South Africa",idx:0.5,cur:"USD"},
+ CUSTOM:{label:"Custom",idx:1,cur:"USD"}
+};
+const MKT_GROUPS=[["North America",["US","CA","MX"]],["Europe",["GB","DE","FR","NL","NORDICS","CH","ES","IT","PT","PL"]],["Asia-Pacific",["AU","JP","IN","SEA"]],["Latin America",["BR","AR"]],["Middle East & Africa",["AE","ZA"]],["Other",["CUSTOM"]]];
+const COMPARE=["US","GB","DE","ES","BR","IN"];
+const CUR={USD:"$",EUR:"€",GBP:"£",CAD:"CA$",AUD:"A$",CHF:"CHF "};
 const OBJ={awareness:{cpm:.8,ctr:.85,cvr:.7},traffic:{cpm:.95,ctr:1.15,cvr:.85},conversions:{cpm:1.1,ctr:1,cvr:1.15}};
-const SUGGEST={awareness:{meta:40,google:5,tiktok:35,linkedin:5,pinterest:15},traffic:{meta:40,google:25,tiktok:20,linkedin:5,pinterest:10},conversions:{meta:40,google:40,tiktok:10,linkedin:5,pinterest:5}};
-const DEF={budget:6000,days:30,market:"PT",aov:45,objective:"conversions",mix:{...SUGGEST.conversions},over:{}};
-let S=load()||JSON.parse(JSON.stringify(DEF));
+const SUGGEST={awareness:{meta:35,google:5,tiktok:25,linkedin:5,pinterest:10,youtube:20},traffic:{meta:40,google:25,tiktok:15,linkedin:5,pinterest:5,youtube:10},conversions:{meta:40,google:40,tiktok:10,linkedin:5,pinterest:5,youtube:0}};
+const DEF={budget:10000,days:30,market:"US",currency:"USD",custom:1,aov:60,objective:"conversions",mix:{...SUGGEST.conversions},over:{}};
+let S=load();
+if(!S||!MKT[S.market]||!S.currency) S=JSON.parse(JSON.stringify(DEF));
 const $=id=>document.getElementById(id);
 const fmt=(n,d=0)=>isFinite(n)?n.toLocaleString("en-GB",{minimumFractionDigits:d,maximumFractionDigits:d}):"–";
-const eur=(n,d=0)=>isFinite(n)?"€"+fmt(n,d):"–";
+const eur=(n,d=0)=>isFinite(n)?(CUR[S.currency]||"$")+fmt(n,d):"–";
 const big=n=>n>=1e6?fmt(n/1e6,1)+"M":n>=1e4?fmt(n/1e3,0)+"k":fmt(n);
-function load(){try{const r=localStorage.getItem("plano.v1");return r?JSON.parse(r):null}catch(e){return null}}
-function save(){try{localStorage.setItem("plano.v1",JSON.stringify(S))}catch(e){}}
+function load(){try{const r=localStorage.getItem("plano.v2");return r?JSON.parse(r):null}catch(e){return null}}
+function save(){try{localStorage.setItem("plano.v2",JSON.stringify(S))}catch(e){}}
 function toast(t){const el=$("toast");el.textContent=t;el.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove("on"),1800)}
 function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
 
-function bench(id){
-  const o=S.over[id]||{},b=BASE[id],m=MKT[S.market],ob=OBJ[S.objective];
-  return {cpm:o.cpm??+(b.cpm*m.cpm*ob.cpm).toFixed(2),ctr:o.ctr??+(b.ctr*ob.ctr).toFixed(2),cvr:o.cvr??+(b.cvr*ob.cvr).toFixed(2)};
+const mIdx=(k)=>k==="CUSTOM"?(+S.custom||1):MKT[k].idx;
+function bench(id,market=S.market,useOver=true){
+  const o=useOver?(S.over[id]||{}):{},b=BASE[id],ob=OBJ[S.objective];
+  return {cpm:o.cpm??+(b.cpm*mIdx(market)*ob.cpm).toFixed(2),ctr:o.ctr??+(b.ctr*ob.ctr).toFixed(2),cvr:o.cvr??+(b.cvr*ob.cvr).toFixed(2)};
 }
+// market + currency selects
+const msel=document.getElementById("market");
+msel.innerHTML=MKT_GROUPS.map(([g,ks])=>`<optgroup label="${g}">${ks.map(k=>`<option value="${k}">${MKT[k].label}</option>`).join("")}</optgroup>`).join("");
+document.getElementById("currency").innerHTML=Object.keys(CUR).map(c=>`<option value="${c}">${c}</option>`).join("");
 
 // --- build inputs ---
 const mixEl=$("mix");
@@ -284,15 +320,17 @@ CH.forEach(c=>{
 $("budget").addEventListener("input",e=>{S.budget=Math.max(0,+e.target.value||0);render()});
 $("days").addEventListener("input",e=>{S.days=Math.max(1,+e.target.value||1);render()});
 $("aov").addEventListener("input",e=>{S.aov=Math.max(0,+e.target.value||0);render()});
-$("market").addEventListener("change",e=>{S.market=e.target.value;render()});
+$("market").addEventListener("change",e=>{S.market=e.target.value;S.currency=MKT[S.market].cur;S.over={};render();toast("Benchmarks set for "+MKT[S.market].label)});
+$("currency").addEventListener("change",e=>{S.currency=e.target.value;render()});
+$("customidx").addEventListener("input",e=>{const v=parseFloat(e.target.value);if(isFinite(v)&&v>0){S.custom=v;S.over={};render()}});
 $("objective").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;S.objective=b.dataset.v;render()});
 $("suggest").addEventListener("click",()=>{S.mix={...SUGGEST[S.objective]};render();toast("Mix updated for "+S.objective)});
 $("reset").addEventListener("click",()=>{S=JSON.parse(JSON.stringify(DEF));render();toast("Reset to example plan")});
 
-function compute(){
+function compute(market=S.market,useOver=true){
   const tot=CH.reduce((a,c)=>a+(S.mix[c.id]||0),0)||1;
   const rows=CH.map(c=>{
-    const share=(S.mix[c.id]||0)/tot,b=bench(c.id),spend=S.budget*share;
+    const share=(S.mix[c.id]||0)/tot,b=bench(c.id,market,useOver),spend=S.budget*share;
     const imp=b.cpm>0?spend/b.cpm*1000:0,clk=imp*b.ctr/100,conv=clk*b.cvr/100;
     return {...c,share,spend,imp,clk,conv,b,cpc:clk?spend/clk:NaN,cpa:conv?spend/conv:NaN,roas:spend?conv*S.aov/spend:NaN};
   });
@@ -302,7 +340,10 @@ function compute(){
 }
 
 function render(){
-  $("budget").value=S.budget;$("days").value=S.days;$("aov").value=S.aov;$("market").value=S.market;
+  $("budget").value=S.budget;$("days").value=S.days;$("aov").value=S.aov;$("market").value=S.market;$("currency").value=S.currency;
+  $("customwrap").hidden=S.market!=="CUSTOM";if(document.activeElement!==$("customidx"))$("customidx").value=S.custom;
+  $("idxout").textContent=fmt(mIdx(S.market),2)+"×";
+  $("budgetlbl").textContent=`Total budget (${S.currency})`;$("aovlbl").textContent=`Value per conversion (${S.currency})`;
   document.querySelectorAll("#objective button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===S.objective));
   const {rows,T}=compute();
   rows.forEach(r=>{$("mx-"+r.id).value=S.mix[r.id]||0;$("mo-"+r.id).textContent=Math.round(r.share*100)+"%";
@@ -311,6 +352,11 @@ function render(){
   const active=rows.filter(r=>r.share>0).length;
   $("mixnote").textContent=active?`${active} active channel${active>1?"s":""}. Shares are normalised to 100%.`:"Move a slider to include at least one channel.";
   $("fc-sub").textContent=`${MKT[S.market].label}, ${S.days} days, ${S.objective}`;
+  // market comparison
+  const cmpKeys=[S.market,...COMPARE.filter(k=>k!==S.market)].slice(0,6);
+  const cmpRows=cmpKeys.map(k=>({k,...compute(k,k===S.market).T}));
+  const bestCpa=Math.min(...cmpRows.map(r=>isFinite(r.cpa)?r.cpa:Infinity));
+  $("mktbody").innerHTML=cmpRows.map(r=>`<tr class="${r.k===S.market?"cur":""}"><td>${MKT[r.k].label}${r.k===S.market?" (selected)":""}</td><td>${fmt(mIdx(r.k),2)}×</td><td>${fmt(r.clk)}</td><td>${fmt(r.conv)}</td><td class="${r.cpa===bestCpa?"best":""}">${eur(r.cpa,2)}</td><td>${fmt(r.roas,2)}×</td></tr>`).join("");
   $("headline").textContent=`What ${eur(S.budget)} buys`;
   const reach=T.imp/ Math.max(1.6, Math.min(4, S.days/8)); // rough unique reach from avg frequency
   $("kpis").innerHTML=[
@@ -332,7 +378,7 @@ function render(){
     if(be!==null)ins.push(T.roas>=1?`At ${eur(S.aov)} per conversion the plan returns ${fmt(T.roas,2)}× its spend before margins. Check that this covers product cost and fees.`:`At ${eur(S.aov)} per conversion the plan returns ${fmt(T.roas,2)}× its spend, so it loses money on direct sales. That can still work for a launch or a high-lifetime-value product, but say so in the brief.`);
     const daily=T.spend/S.days;
     const thin=live.filter(r=>r.spend/S.days<10);
-    if(thin.length)ins.push(`${thin.map(r=>r.name).join(" and ")} ${thin.length>1?"get":"gets"} under €10 a day. Small daily budgets keep ad sets in the learning phase for longer, so consider fewer channels.`);
+    if(thin.length)ins.push(`${thin.map(r=>r.name).join(", ")} ${thin.length>1?"get":"gets"} under ${eur(10)} a day. Small daily budgets keep ad sets in the learning phase for longer, so consider fewer channels.`);
     else ins.push(`Daily spend is ${eur(daily)}. Expect around a week of learning before the conversion numbers settle.`);
   } else ins.push("Add a channel to see a forecast.");
   $("insights").innerHTML=ins.map(t=>`<li>${t}</li>`).join("");
@@ -341,8 +387,8 @@ function render(){
 
 $("copyplan").addEventListener("click",()=>{
   const {rows,T}=compute();
-  const head=["Channel","Budget (€)","€/day","CPM (€)","CTR (%)","CVR (%)","Impressions","Clicks","CPC (€)","Conversions","CPA (€)","ROAS"];
-  const L=[["Plano media plan",MKT[S.market].label,S.objective,S.days+" days"].join("\t"),head.join("\t")];
+  const c=S.currency;const head=["Channel",`Budget (${c})`,`${c}/day`,`CPM (${c})`,"CTR (%)","CVR (%)","Impressions","Clicks",`CPC (${c})`,"Conversions",`CPA (${c})`,"ROAS"];
+  const L=[["Plano media plan",MKT[S.market].label,S.currency,S.objective,S.days+" days"].join("\t"),head.join("\t")];
   rows.filter(r=>r.share>0).forEach(r=>L.push([r.name,r.spend.toFixed(0),(r.spend/S.days).toFixed(0),r.b.cpm,r.b.ctr,r.b.cvr,r.imp.toFixed(0),r.clk.toFixed(0),r.cpc.toFixed(2),r.conv.toFixed(1),r.cpa.toFixed(2),r.roas.toFixed(2)].join("\t")));
   L.push(["Total",T.spend.toFixed(0),(T.spend/S.days).toFixed(0),"","","",T.imp.toFixed(0),T.clk.toFixed(0),T.cpc.toFixed(2),T.conv.toFixed(1),T.cpa.toFixed(2),T.roas.toFixed(2)].join("\t"));
   copyText(L.join("\n"),"Plan copied. Paste it into a sheet.");
