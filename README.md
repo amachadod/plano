@@ -1,6 +1,8 @@
 # Plano
 
 **A paid media budget forecaster for any market.**
+
+**Who it's for:** media planners, account managers and small business owners who need a quick answer to "what will this budget get us in this country?"
 Split a campaign budget across Meta, Google Search, YouTube, TikTok, LinkedIn and Pinterest, forecast what it can buy in the country you're targeting, and compare the same plan across markets.
 
 👉 **Live demo:** **[amachadod.github.io/plano](https://amachadod.github.io/plano/)**
@@ -66,3 +68,6 @@ Advertising and PR graduate (Universidad Complutense de Madrid) with experience 
 ## License
 
 MIT
+
+---
+Built by Alberto Machado Domínguez · [albertomachdom@gmail.com](mailto:albertomachdom@gmail.com) · [LinkedIn](https://www.linkedin.com/in/alberto-machado-dom%C3%ADnguez-708290251/)
